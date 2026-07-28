@@ -1,0 +1,260 @@
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><title>Ancaa</title><style>@layer base{html,body{margin:0;padding:0;overflow-x:hidden;}body{overscroll-behavior:none;min-height:100vh;position:relative;background-color:#fff9ed;}.neo-brutal-shadow{box-shadow:8px 8px 0px 0px #000000;transition:all 0.2s ease;}.neo-brutal-shadow:hover{box-shadow:2px 2px 0px 0px #000000;transform:translate(6px,6px);}.bg-grid-animation{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={theme:{extend:{"colors":{"on-secondary-fixed":"#2c0051","primary-container":"#8455ef","inverse-primary":"#d0bcff","on-error-container":"#93000a","on-secondary-fixed-variant":"#6900b3","outline":"#7b7486","inverse-on-surface":"#f7f0e0","secondary-fixed":"#f0dbff","on-tertiary":"#ffffff","surface-container-highest":"#e9e2d2","on-primary":"#ffffff","surface":"#fff9ed","yellow-accent":"#FACC15","secondary-container":"#9c48ea","error":"#ba1a1a","secondary-fixed-dim":"#ddb7ff","primary-fixed":"#e9ddff","surface-container":"#f4edde","on-tertiary-fixed":"#002109","on-error":"#ffffff","surface-container-high":"#eee8d8","outline-variant":"#cbc3d7","black":"#000000","text-main":"#111111","tertiary-fixed":"#6bff8f","surface-container-lowest":"#ffffff","error-container":"#ffdad6","on-surface-variant":"#494454","surface-bright":"#fff9ed","tertiary-fixed-dim":"#4ae176","on-primary-fixed":"#23005c","on-tertiary-container":"#f7fff3","on-primary-fixed-variant":"#5516be","tertiary":"#006b2d","on-tertiary-fixed-variant":"#005321","on-background":"#1e1c12","inverse-surface":"#333026","surface-dim":"#e0daca","on-secondary-container":"#fffbff","surface-container-low":"#faf3e3","background":"#fff9ed","secondary":"#8127cf","surface-tint":"#6d3bd7","primary-fixed-dim":"#d0bcff","on-surface":"#1e1c12","on-primary-container":"#fffbff","on-secondary":"#ffffff","surface-variant":"#e9e2d2","pink-accent":"#EC4899","orange-accent":"#F97316","primary":"#6b38d4","tertiary-container":"#00873b"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"margin-mobile":"20px","unit":"8px","shadow-offset":"8px","border-width":"4px","margin-desktop":"64px","gutter":"24px"},"fontFamily":{"headline-lg-mobile":["Space Grotesk"],"headline-lg":["Space Grotesk"],"body-md":["Hanken Grotesk"],"body-lg":["Hanken Grotesk"],"display-lg-mobile":["Space Grotesk"],"headline-md":["Space Grotesk"],"display-lg":["Space Grotesk"],"label-md":["Space Grotesk"]},"fontSize":{"headline-lg-mobile":["32px",{"lineHeight":"1.2","fontWeight":"700"}],"headline-lg":["40px",{"lineHeight":"1.2","letterSpacing":"-0.02em","fontWeight":"700"}],"body-md":["16px",{"lineHeight":"1.6","fontWeight":"400"}],"body-lg":["20px",{"lineHeight":"1.6","fontWeight":"400"}],"display-lg-mobile":["48px",{"lineHeight":"1.1","letterSpacing":"-0.04em","fontWeight":"700"}],"headline-md-mobile":["18px",{"lineHeight":"1.3","fontWeight":"600"}],"headline-md":["24px",{"lineHeight":"1.3","fontWeight":"600"}],"display-lg":["72px",{"lineHeight":"1.1","letterSpacing":"-0.04em","fontWeight":"700"}],"label-md":["14px",{"lineHeight":"1.0","letterSpacing":"0.05em","fontWeight":"700"}]}}}}</script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@100..900&family=Space+Grotesk:wght@100..900&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/></head><body class="font-body-md text-on-surface"><div class="bg-grid-animation"><!-- STITCH_SHADER_START:ANIMATION_2 class="" -->
+<div class="" style="display:block;width:100%;height:100%;min-height:200px;">
+<canvas id="shader-canvas-ANIMATION_2" style="display:block;width:100%;height:100%"></canvas>
+<script>
+(function() {
+  const canvas = document.getElementById('shader-canvas-ANIMATION_2');
+
+  // Sync the WebGL drawing-buffer size with the CSS-driven layout size.
+  // This fires on initial layout and whenever the element is resized.
+  function syncSize() {
+    const w = canvas.clientWidth  || 1280;
+    const h = canvas.clientHeight || 720;
+    if (canvas.width !== w || canvas.height !== h) {
+      canvas.width  = w;
+      canvas.height = h;
+    }
+  }
+  if (typeof ResizeObserver !== 'undefined') {
+    new ResizeObserver(syncSize).observe(canvas);
+  }
+  syncSize();
+
+  const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+  if (!gl) return;
+  const vs = `attribute vec2 a_position;
+varying vec2 v_texCoord;
+void main() {
+  v_texCoord = a_position * 0.5 + 0.5;
+  gl_Position = vec4(a_position, 0.0, 1.0);
+}`;
+  const fs = `precision highp float;
+varying vec2 v_texCoord;
+uniform float u_time;
+uniform vec2 u_resolution;
+
+void main() {
+    vec2 uv = v_texCoord;
+    
+    // Create a subtle grain/noise texture
+    float noise = fract(sin(dot(uv, vec2(12.9898, 78.233))) * 43758.5453);
+    
+    // Create a very subtle animated grid pattern
+    vec2 grid = fract(uv * 40.0 + sin(u_time * 0.2) * 0.1);
+    float line = smoothstep(0.0, 0.05, grid.x) * smoothstep(1.0, 0.95, grid.x) *
+                 smoothstep(0.0, 0.05, grid.y) * smoothstep(1.0, 0.95, grid.y);
+    
+    vec3 bgColor = vec3(1.0, 0.97, 0.91); // #FFF8E8
+    vec3 gridColor = vec3(0.0, 0.0, 0.0);
+    
+    vec3 finalColor = mix(bgColor, gridColor, (1.0 - line) * 0.03);
+    finalColor += noise * 0.02; // Add a touch of noise
+    
+    gl_FragColor = vec4(finalColor, 1.0);
+}`;
+  function cs(type, src) {
+    const s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    return s;
+  }
+  const prog = gl.createProgram();
+  gl.attachShader(prog, cs(gl.VERTEX_SHADER, vs));
+  gl.attachShader(prog, cs(gl.FRAGMENT_SHADER, fs));
+  gl.linkProgram(prog);
+  gl.useProgram(prog);
+  const buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+  const pos = gl.getAttribLocation(prog, 'a_position');
+  gl.enableVertexAttribArray(pos);
+  gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
+  const uTime = gl.getUniformLocation(prog, 'u_time');
+  const uRes = gl.getUniformLocation(prog, 'u_resolution');
+  const uMouse = gl.getUniformLocation(prog, 'u_mouse');
+
+  // u_mouse is in pixel coordinates matching u_resolution (ShaderToy convention).
+  // Shaders that need normalized coords should use: u_mouse / u_resolution.
+  let mouse = { x: canvas.width / 2, y: canvas.height / 2 };
+  window.addEventListener('mousemove', (event) => {
+    const rect = canvas.getBoundingClientRect();
+    if (rect.width && rect.height) {
+      const nx = (event.clientX - rect.left) / rect.width;
+      const ny = 1.0 - (event.clientY - rect.top) / rect.height;
+      mouse.x = nx * canvas.width;
+      mouse.y = ny * canvas.height;
+    }
+  });
+
+  function render(t) {
+    if (typeof ResizeObserver === 'undefined') syncSize();
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    if (uTime) gl.uniform1f(uTime, t * 0.001);
+    if (uRes) gl.uniform2f(uRes, canvas.width, canvas.height);
+    if (uMouse) gl.uniform2f(uMouse, mouse.x, mouse.y);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    requestAnimationFrame(render);
+  }
+  render(0);
+})();
+</script>
+</div>
+<!-- STITCH_SHADER_END:ANIMATION_2 --></div><main class="w-full pt-16 sm:pt-32 px-margin-mobile lg:px-margin-desktop max-w-7xl mx-auto"><div class="flex flex-col w-full">
+<!-- Hero Section -->
+<section class="relative flex flex-col items-center justify-center py-6 sm:py-20 overflow-hidden">
+<div class="absolute -top-24 -left-24 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse"></div>
+<div class="absolute top-1/2 -right-32 w-80 h-80 bg-pink-accent/10 rounded-full blur-3xl"></div>
+<div class="relative group">
+<div class="absolute -inset-4 bg-yellow-accent rounded-full opacity-20 group-hover:opacity-40 transition-opacity animate-[ping_3s_linear_infinite]"></div>
+<div class="relative w-48 h-48 md:w-64 md:h-64 rounded-full border-4 border-black overflow-hidden neo-brutal-shadow animate-[float_6s_ease-in-out_infinite]">
+<img alt="ANCAA Avatar" class="w-full h-full object-cover" src="./img/logo.jpeg"/>
+</div>
+<div class="absolute bottom-4 right-4 bg-blue-500 border-4 border-black px-4 py-1 rounded-full flex items-center gap-2 neo-brutal-shadow rotate-12">
+<span class="material-symbols-outlined text-white text-sm" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="font-label-md text-label-md text-white">VERIFIED</span>
+</div>
+</div>
+<div class="mt-8 sm:mt-12 text-center z-10">
+<h1 class="font-display-lg text-display-lg-mobile md:text-display-lg text-black mb-2 tracking-tighter">Ancaa</h1>
+<p class="font-headline-md text-headline-md-mobile md:text-headline-md text-primary mb-6">@ancagaming11_</p>
+<div class="flex justify-center mb-8">
+<span class="px-8 py-3 bg-yellow-accent border-4 border-black rounded-full font-label-md text-label-md text-black neo-brutal-shadow rotate-[-1deg]">STREAMER</span>
+</div>
+<div class="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6 w-full max-w-md mx-auto">
+<a href="javascript:void(0)" onclick="confirmDiscord()" class="group flex items-center justify-center gap-3 px-6 py-4 sm:px-8 sm:py-4 bg-[#5865F2] border-4 border-black rounded-full font-label-md text-label-md text-white neo-brutal-shadow hover:bg-white hover:text-[#5865F2] transition-all w-full sm:w-auto">
+<svg class="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="currentColor">
+<path d="M19.27 5.33C17.94 4.71 16.5 4.26 15 4a.09.09 0 0 0-.07.03c-.18.33-.39.76-.53 1.09a16.09 16.09 0 0 0-4.8 0c-.14-.34-.35-.76-.54-1.09-.01-.02-.04-.03-.07-.03-1.5.26-2.93.71-4.27 1.33-.01 0-.02.01-.03.02-2.72 4.07-3.47 8.03-3.1 11.95 0 .02.01.04.03.05 1.8 1.32 3.53 2.12 5.24 2.65.03.01.06 0 .07-.02.4-.55.76-1.13 1.07-1.74.02-.04 0-.08-.04-.09-.57-.22-1.11-.48-1.64-.78-.04-.02-.04-.08-.01-.11.11-.08.22-.17.33-.25.02-.02.05-.02.07-.01 3.44 1.57 7.17 1.57 10.57 0 .02-.01.05-.01.07.01.11.09.22.17.33.26.04.03.04.09-.01.11-.52.31-1.07.56-1.64.78-.04.01-.05.06-.04.09.32.61.68 1.19 1.07 1.74.03.01.06.02.09.01 1.72-.53 3.45-1.33 5.25-2.65.02-.01.03-.03.03-.05.44-4.53-.73-8.46-3.1-11.95-.01-.01-.02-.02-.04-.02zM8.52 14.91c-1.03 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12 0 1.17-.84 2.12-1.89 2.12zm6.97 0c-1.03 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12 0 1.17-.83 2.12-1.89 2.12z"/>
+</svg>
+                    DISCORD
+                </a>
+<a href="javascript:void(0)" onclick="confirmDonate()" class="group flex items-center justify-center gap-3 px-6 py-4 sm:px-8 sm:py-4 bg-black border-4 border-black rounded-full font-label-md text-label-md text-white neo-brutal-shadow hover:bg-[#FF6B35] hover:border-[#FF6B35] transition-all w-full sm:w-auto">
+<svg class="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+<circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/>
+<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+<path d="M9 10l3-3 3 3"/>
+</svg>
+                    DONATE
+                </a>
+</div>
+</div>
+</section>
+
+</div>
+
+
+<style>
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0); }
+            50% { transform: translateY(-20px) rotate(2deg); }
+        }
+        .swal2-popup {
+            padding: 2rem !important;
+            border: 4px solid black !important;
+            border-radius: 24px !important;
+            box-shadow: 8px 8px 0px 0px #000000 !important;
+        }
+        .swal2-title {
+            font-family: 'Space Grotesk', sans-serif !important;
+            font-weight: 700 !important;
+        }
+        .swal2-html-container {
+            font-family: 'Hanken Grotesk', sans-serif !important;
+        }
+        .swal2-confirm {
+            border: 3px solid black !important;
+            border-radius: 9999px !important;
+            font-family: 'Space Grotesk', sans-serif !important;
+            font-weight: 700 !important;
+            font-size: 14px !important;
+            letter-spacing: 0.05em !important;
+        }
+        .swal2-cancel {
+            border: 3px solid black !important;
+            border-radius: 9999px !important;
+            font-family: 'Space Grotesk', sans-serif !important;
+            font-weight: 700 !important;
+            font-size: 14px !important;
+            letter-spacing: 0.05em !important;
+        }
+        @media (max-width: 640px) {
+            .swal2-popup {
+                padding: 1.25rem !important;
+                width: 88% !important;
+                max-width: 88% !important;
+                margin: 0 auto !important;
+            }
+            .swal2-title {
+                font-size: 1.25rem !important;
+            }
+            .swal2-html-container {
+                font-size: 0.875rem !important;
+            }
+            .swal2-actions {
+                flex-direction: column !important;
+                gap: 0.5rem !important;
+            }
+            .swal2-confirm, .swal2-cancel {
+                width: 100% !important;
+                padding: 0.75rem 1rem !important;
+            }
+        }
+    </style>
+</div></main><footer class="w-full pt-16 pb-8 px-margin-mobile lg:px-margin-desktop"><div class="max-w-7xl mx-auto border-t-4 border-black pt-6 flex flex-col items-center"><p class="font-body-md text-sm sm:text-body-md text-black text-center">Made with ❤️ by <span class="font-bold">ANCAA</span></p></div></footer>
+<script>
+function confirmDiscord() {
+    Swal.fire({
+        title: 'Join Discord',
+        text: 'Klik tombol di bawah untuk bergabung ke server Discord Ancaa!',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#5865F2',
+        cancelButtonColor: '#111',
+        confirmButtonText: 'Buka Discord',
+        cancelButtonText: 'Batal',
+        background: '#fff9ed',
+        color: '#111',
+        customClass: {
+            popup: 'animate__animated animate__fadeInDown'
+        },
+        showClass: {
+            popup: 'animate__animated animate__fadeInDown'
+        },
+        hideClass: {
+            popup: 'animate__animated animate__fadeOutUp'
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.open('https://discord.com/invite/7UaMWr2N4', '_blank');
+        }
+    });
+}
+function confirmDonate() {
+    Swal.fire({
+        title: 'Support Ancaa',
+        text: 'Terima kasih sudah mau mendukung! Klik tombol di bawah untuk donate.',
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonColor: '#FF6B35',
+        cancelButtonColor: '#111',
+        confirmButtonText: 'Donate Sekarang',
+        cancelButtonText: 'Batal',
+        background: '#fff9ed',
+        color: '#111',
+        showClass: {
+            popup: 'animate__animated animate__fadeInDown'
+        },
+        hideClass: {
+            popup: 'animate__animated animate__fadeOutUp'
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.open('https://sociabuzz.com/anca011/tribe', '_blank');
+        }
+    });
+}
+</script>
+</body></html>
